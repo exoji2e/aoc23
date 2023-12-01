@@ -91,8 +91,12 @@ def mkdirs(f):
 def symlink_force(target, link_name):
     try:
         os.remove(link_name)
+    except FileNotFoundError:
+        pass
+    try:
         os.symlink(target, link_name)
-    except: pass
+    except Exception as e:
+        pass
 
 def wait_until(date_time):
     now = datetime.now().astimezone()
