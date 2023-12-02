@@ -1,12 +1,12 @@
+import time
 import argparse
-import sys, time, os, glob, time, errno, shutil
+import sys, os, glob, shutil
 from datetime import datetime, timezone, timedelta
 import logging as log
 import pathlib
-import progressbar
-import requests, bs4
 import pyperclip
 import shutil
+
 
 sys.path.extend(['..', '.'])
 from utils import get_lines, print_stats
@@ -30,6 +30,7 @@ def copy_to_clipboard(s):
 
 def submit_real(year, day, level, answer):
     from secret import session
+    import requests
     jar = requests.cookies.RequestsCookieJar()
     jar.set('session', session)
     url = 'https://adventofcode.com/{}/day/{}/answer'.format(year, day)
@@ -44,7 +45,7 @@ def submit_real(year, day, level, answer):
 
     if not r.status_code == 200:
         return 'StatusCode: {}\n{}'.format(r.status_code, r.text)
-
+    import bs4
     html = bs4.BeautifulSoup(r.text, 'html.parser')
     return html.find('article').text
 
@@ -66,6 +67,7 @@ def submit(year, day, level, answer, no_prompt):
 
 def dl(fname, day, year):
     from secret import session
+    import requests
     jar = requests.cookies.RequestsCookieJar()
     jar.set('session', session)
     url = 'https://adventofcode.com/{}/day/{}/input'.format(year, day)
@@ -104,6 +106,7 @@ def wait_until(date_time):
     t0 = now.timestamp()
     M = int(tE-t0) + 1
     if M <= 0: return
+    import progressbar
     widgets=[
         ' [', progressbar.CurrentTime(), '] ',
         progressbar.Bar(),
@@ -298,4 +301,7 @@ def create_day(day):
             t.write(s.read().replace('datetime.date.today().day', str(day)))
     sample1 = f'{samples}/1.in'
     with open(sample1, 'w') as f:
+        f.write('')
+    input_path = f'{padded}/input.in'
+    with open(input_path, 'w') as f:
         f.write('')
