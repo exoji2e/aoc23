@@ -4,3 +4,4 @@ __pycache__
 cache
 runs
 last_run
+.vscode
