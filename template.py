@@ -7,11 +7,15 @@ from utils import *
 def get_day(): return datetime.date.today().day
 def get_year(): return 2023
 
+def parse(ln):
+    return lazy_ints(multi_split(ln, ' '))
+
 def p1(v):
     lns = get_lines(v)
     chunks = v.split('\n\n')
     ans = 0
     for ln in lns:
+        item = parse(ln)
         ans += 1
     return ans
 
