@@ -4,7 +4,9 @@ sys.path.extend(['..', '.'])
 from collections import *
 from runner import main, get_commands
 from utils import *
-import numpy as np
+try:
+    import numpy as np
+except: pass
 def get_day(): return 21
 def get_year(): return 2023
 
@@ -40,7 +42,7 @@ def p1(v):
                 S = i, j
     return count(S, G, 64)
 
-def p2(v):
+def p2_polyfit(v):
     G = get_lines(v)
     S = None
     for i, row in enumerate(G):
@@ -57,6 +59,71 @@ def p2(v):
     n = (26501365 - 65)//131
     return round(a*n*n + b*n + c)
 
+def p2(v):
+    G = get_lines(v)
+    S = None
+    for i, row in enumerate(G):
+        for j, ch in enumerate(row):
+            if ch == 'S':
+                S = i, j
+    L = 700
+    D = walk(S, G, L)
+    res = calc(D, G, 26501365)
+    assert res == p2_polyfit(v)
+    return res
+
+DP = {}
+def get(sL, R):
+    T = sL, R
+    if T in DP: return DP[T]
+    ans = 0
+    parity = sL%2
+    cntV = 0
+    while cntV*R <= sL:
+        p2 = (parity + cntV)%2
+        left = sL - cntV*R
+        mxDh = left//R
+        if p2:
+            ans += (mxDh+1)//2
+        else:
+            ans += (mxDh+2)//2
+        cntV += 1
+    DP[T] = ans
+    return ans
+
+def calc(D, G, steps):
+    ans = 0
+    R, C = len(G), len(G[0])
+    for i, row in enumerate(G):
+        for j, ch in enumerate(row):
+            if ch == '#': continue
+            if (i, j) not in D: continue
+            this = 0
+            diag = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
+            str = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+            s = D[i, j]
+            if s <= steps and (steps - s)%2 == 0:
+                this += 1
+
+            for dx, dy in diag:
+                k = i + R*dx, j + C*dy
+                s = D[k]
+                sL = steps - s
+                x = get(sL, R)
+                this += x
+            for dx, dy in str:
+                k = i + R*dx, j + C*dy
+                s = D[k]
+                pair = (steps - s)%2
+                left = steps - s
+                if left >= 0:
+                    tiles = left//R
+                    if pair: # odd
+                        this += (tiles+1)//2
+                    else:
+                        this += (tiles+2)//2
+            ans += this
+    return ans
 
 if __name__ == '__main__':
     options = get_commands()
