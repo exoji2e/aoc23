@@ -5,3 +5,4 @@ cache
 runs
 last_run
 .vscode
+.DS_Store
